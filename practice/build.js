@@ -3,6 +3,13 @@ const fs = require('fs'), path = require('path');
 const root = path.join(__dirname, '..');
 eval(fs.readFileSync(path.join(root, 'data.js'), 'utf8') + ';global.ENGINES=ENGINES;global.CATS=CATS;');
 const SKIP = ['gamma', 'heygen', 'zapier']; // 별도 전용 연습실이 있는 엔진
+// plus/ 폴더의 각 파일이 어떤 엔진을 담고 있는지 찾기 (파일 하나에 여러 엔진 가능)
+const plusDirPath = path.join(__dirname, 'content', 'plus');
+const plusMap = {};
+if (fs.existsSync(plusDirPath)) for (const f of fs.readdirSync(plusDirPath)) {
+  const src = fs.readFileSync(path.join(plusDirPath, f), 'utf8');
+  for (const m of src.matchAll(/P\('([a-z0-9]+)'/g)) (plusMap[m[1]] = plusMap[m[1]] || []).push(f);
+}
 let n = 0;
 for (const e of ENGINES) {
   if (SKIP.includes(e.id)) continue;
@@ -25,7 +32,7 @@ for (const e of ENGINES) {
 <noscript>이 연습실은 자바스크립트가 필요해요.</noscript>
 <script>window.ENGINE_ID = "${e.id}";</script>
 <script src="../../data.js"></script>
-<script src="../content/${e.cat}.js"></script>${fs.existsSync(path.join(__dirname, 'content', 'plus', e.id + '.js')) ? `\n<script src="../content/plus/${e.id}.js"></script>` : ''}
+<script src="../content/${e.cat}.js"></script>${(plusMap[e.id] || []).map(f => `\n<script src="../content/plus/${f}"></script>`).join('')}
 <script src="../assets/practice.js"></script>
 </body>
 </html>
