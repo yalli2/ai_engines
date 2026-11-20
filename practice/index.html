@@ -74,7 +74,7 @@
   <section class="hero">
     <span class="chip">🎮 100개 엔진 · 분야 10개</span><span class="chip">✳️ Claude 협업 중심</span><span class="chip">📅 2026년 11월 기준</span>
     <h1>AI 엔진 100개,<br>Claude와 함께 하나씩 정복하기</h1>
-    <p>전 세계에서 가장 많이 쓰이는 AI 엔진들의 핵심 기능을 미니 시뮬레이터로 직접 눌러 보고, 각 엔진을 <b>Claude와 어떻게 연결해 협업하는지</b> 프롬프트까지 연습해요. 엔진마다 미션 9개, 졸업하면 수료증! 🎓</p>
+    <p>전 세계에서 가장 많이 쓰이는 AI 엔진들의 핵심 기능을 미니 시뮬레이터로 직접 눌러 보고, 각 엔진을 <b>Claude와 어떻게 연결해 협업하는지</b> 프롬프트까지 연습해요. 엔진마다 기능 미션 최대 10개 이상 + 연결·레시피·졸업 미션, 졸업하면 수료증! 🎓</p>
     <a class="btn c" href="#paths">🗺️ 추천 코스 보기</a> <a class="btn w" href="#all" style="margin-left:6px">🔎 전체 엔진 둘러보기</a>
     <div class="stats" id="stats"></div>
   </section>
@@ -103,7 +103,7 @@
 
 <script src="../data.js"></script>
 <script src="content/llm.js"></script><script src="content/research.js"></script><script src="content/image.js"></script><script src="content/video.js"></script><script src="content/audio.js"></script>
-<script src="content/avatar.js"></script><script src="content/design.js"></script><script src="content/coding.js"></script><script src="content/automation.js"></script><script src="content/meeting.js"></script>
+<script src="content/avatar.js"></script><script src="content/design.js"></script><script src="content/coding.js"></script><script src="content/automation.js"></script><script src="content/meeting.js"></script><script src="content/counts.json.js"></script>
 <script>
 (() => {
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
@@ -116,7 +116,8 @@ const short = e => e.name.split(' (')[0];
 const href = e => EXT[e.id] || `${e.id}/`;
 function prog(e) {
   if (EXT[e.id]) return null;
-  try { const s = JSON.parse(localStorage.getItem('aep_' + e.id) || 'null'); if (!s) return { d: 0, t: 9, xp: 0, b: 0 }; return { d: Object.keys(s.done || {}).length, t: s.total || 9, xp: s.xp || 0, b: (s.badges || []).length }; } catch (_) { return { d: 0, t: 9, xp: 0, b: 0 }; }
+  const t = ((window.FEATURE_COUNTS || {})[e.id] || 4) + 5;
+  try { const s = JSON.parse(localStorage.getItem('aep_' + e.id) || 'null'); if (!s) return { d: 0, t, xp: 0, b: 0 }; return { d: Object.keys(s.done || {}).length, t, xp: s.xp || 0, b: (s.badges || []).length }; } catch (_) { return { d: 0, t, xp: 0, b: 0 }; }
 }
 const state = { q: '', cat: 'all', sort: 'collab', st: 'all' };
 
@@ -163,7 +164,8 @@ function render() {
   if (!list.length) { $('#grid').innerHTML = '<div class="empty">조건에 맞는 연습실이 없어요.</div>'; return; }
   $('#grid').innerHTML = list.map(e => {
     const p = prog(e), ext = !!EXT[e.id];
-    const feats = ext ? EXT_FEATS[e.id] : (window.FEATURES[e.id] || []).map(r => r[1]);
+    const fc = (window.FEATURE_COUNTS || {})[e.id] || (window.FEATURES[e.id] || []).length;
+    const feats = ext ? EXT_FEATS[e.id] : (window.FEATURES[e.id] || []).map(r => r[1]).slice(0, 4).concat(fc > 4 ? [`+ 기능 ${fc - 4}개 더`] : []);
     const pct = p ? Math.round(p.d / p.t * 100) : 0;
     const label = ext ? '전용 연습실 열기 ↗' : !p || p.d === 0 ? '시작하기 →' : p.d >= p.t ? '복습하기 →' : '이어하기 →';
     return `<a class="ecard ${p && p.d >= p.t ? 'done' : ''}" style="--c1:${COL[e.cat]}" href="${href(e)}" ${ext ? 'target="_blank" rel="noopener"' : ''}>

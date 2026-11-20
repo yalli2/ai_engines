@@ -25,11 +25,18 @@ for (const e of ENGINES) {
 <noscript>이 연습실은 자바스크립트가 필요해요.</noscript>
 <script>window.ENGINE_ID = "${e.id}";</script>
 <script src="../../data.js"></script>
-<script src="../content/${e.cat}.js"></script>
+<script src="../content/${e.cat}.js"></script>${fs.existsSync(path.join(__dirname, 'content', 'plus', e.id + '.js')) ? `\n<script src="../content/plus/${e.id}.js"></script>` : ''}
 <script src="../assets/practice.js"></script>
 </body>
 </html>
 `);
   n++;
 }
-console.log('generated', n, 'engine labs');
+// 허브용 기능 수 목록
+global.window = {};
+for (const f of fs.readdirSync(path.join(__dirname, 'content'))) if (f.endsWith('.js')) eval(fs.readFileSync(path.join(__dirname, 'content', f), 'utf8'));
+const plusDir = path.join(__dirname, 'content', 'plus');
+if (fs.existsSync(plusDir)) for (const f of fs.readdirSync(plusDir)) eval(fs.readFileSync(path.join(plusDir, f), 'utf8'));
+const counts = Object.fromEntries(Object.entries(window.FEATURES).map(([k, v]) => [k, v.length]));
+fs.writeFileSync(path.join(__dirname, 'content', 'counts.json.js'), '/* 자동 생성: 엔진별 기능 미션 수 */\nwindow.FEATURE_COUNTS = ' + JSON.stringify(counts) + ';\n');
+console.log('generated', n, 'engine labs; features total', Object.values(counts).reduce((a, b) => a + b, 0));

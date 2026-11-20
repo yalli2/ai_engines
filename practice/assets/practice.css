@@ -262,3 +262,8 @@ pre.code{background:#1f1d27;color:#e9e6f2;border-radius:12px;padding:12px 14px;f
   .cert,.cert *{visibility:visible}
   .cert{position:absolute;left:0;top:0;width:100%}
 }
+
+.tipbox{background:#fff8e6;border:1px solid #f3dc9b;border-radius:12px;padding:10px 13px;font-size:14.5px}
+.chap{font-size:15px;margin:22px 0 10px;color:var(--ink2);display:flex;align-items:center;gap:8px}
+.chap:before{content:"";width:6px;height:18px;border-radius:3px;background:var(--grad)}
+.chap small{font-size:12px;color:var(--muted);font-weight:700}

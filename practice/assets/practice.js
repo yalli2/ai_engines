@@ -33,7 +33,8 @@ const RAW = (window.FEATURES || {})[E.id] || [];
 const FEATS = RAW.map(r => ({
   icon: r[0], title: r[1], why: r[2],
   steps: r[3].split('|').map(s => { const [l, ...d] = s.split('::'); return { l: l.trim(), d: d.join('::').trim() }; }),
-  out: r[4], prompt: r[5], quiz: { q: r[6], o: r[7].split('|'), a: r[8], x: r[9] }
+  out: r[4], prompt: r[5], quiz: { q: r[6], o: r[7].split('|'), a: r[8], x: r[9] },
+  group: r[10] || '핵심 기능', tip: r[11] || ''
 }));
 
 /* ---------- 연결 방식별 문구 ---------- */
@@ -92,8 +93,8 @@ MISSIONS.push({
 });
 FEATS.forEach((f, i) => {
   MISSIONS.push({
-    id: 'f' + (i + 1), ch: '핵심 기능', icon: f.icon, title: f.title, sub: `미니 ${SHORT}에서 직접 눌러 보고, Claude와 협업하는 법까지`, time: '8분', xp: 100,
-    why: `<p>${f.why}</p>`,
+    id: 'f' + (i + 1), ch: f.group, icon: f.icon, title: f.title, sub: `기능 ${i + 1}/${FEATS.length} · 미니 ${SHORT}에서 직접 눌러 보고, Claude와 협업하는 법까지`, time: '8분', xp: 100,
+    why: `<p>${f.why}</p>` + (f.tip ? `<p class="tipbox">💡 <b>실전 팁</b> — ${f.tip}</p>` : ''),
     steps: f.steps.map(s => `<b>${esc(s.l)}</b> — ${s.d}`),
     widget: 'sim', feat: f, tasks: { sim: '시뮬레이터 순서대로 완료', review: 'Claude 검수 받기' },
     claude: [{ t: `Claude와 함께: ${f.title}`, p: f.prompt, n: `${CT.short}. [대괄호] 부분을 내 상황에 맞게 바꿔서 쓰세요.` }],
@@ -226,7 +227,7 @@ function renderHome() {
   <section class="hero">
     <span class="chip">${CAT.icon} ${esc(CAT.name)}</span><span class="chip">✳️ Claude 협업도 ${E.collab}점</span><span class="chip">${esc(CONN[E.conn].label)}</span>${E.ko ? '<span class="chip">🇰🇷 한국어 ◎</span>' : ''}
     <h1>${esc(SHORT)} × Claude<br>따라하며 배우는 연습실</h1>
-    <p>${esc(E.vendor)}의 <b>${esc(SHORT)}</b> 핵심 기능 ${FEATS.length}가지를 미니 시뮬레이터로 하나씩 눌러 보고, Claude에게 어떻게 일을 맡기면 되는지 프롬프트까지 연습해요. 미션 ${MISSIONS.length}개를 끝내면 수료증을 드려요! 🎓</p>
+    <p>${esc(E.vendor)}의 <b>${esc(SHORT)}</b> 기능 ${FEATS.length}가지를 미니 시뮬레이터로 하나씩 눌러 보고, Claude에게 어떻게 일을 맡기면 되는지 프롬프트까지 연습해요. 미션 ${MISSIONS.length}개를 끝내면 수료증을 드려요! 🎓</p>
     <button class="btn c" id="startBtn">${done ? '이어서 하기' : '첫 미션 시작'} → ${esc(next ? next.title : '복습하기')}</button>
     ${ext ? `<a class="btn w" style="margin-left:8px" href="${ext}" target="_blank" rel="noopener">✨ 전용 심화 연습실</a>` : ''}
     <div class="stats">
@@ -236,8 +237,8 @@ function renderHome() {
       <div class="stat"><b>${esc(priceParts[0])}</b><span>시작 요금</span></div>
     </div>
   </section>
-  <h2 class="sec-title">🗺️ 미션 지도</h2>
-  <div class="grid g3">${MISSIONS.map((m, i) => `<div class="card mcard ${S.done[m.id] ? 'done' : ''}" data-go="${m.id}"><span class="st">${S.done[m.id] ? '✓ 완료' : 'M' + (i + 1)}</span><div class="big">${m.icon}</div><h3>${esc(m.title)}</h3><p>${esc(m.sub)}</p></div>`).join('')}</div>
+  <h2 class="sec-title">🗺️ 미션 지도 <span style="font-size:14px;color:var(--muted);font-weight:600">· 미션 ${MISSIONS.length}개 · 약 ${Math.round(MISSIONS.length * 7 / 60 * 10) / 10}시간</span></h2>
+  ${[...new Set(MISSIONS.map(m => m.ch))].map(g => `<h3 class="chap">${esc(g)} <small>${MISSIONS.filter(m => m.ch === g && S.done[m.id]).length}/${MISSIONS.filter(m => m.ch === g).length}</small></h3><div class="grid g3">${MISSIONS.filter(m => m.ch === g).map(m => { const i = MISSIONS.indexOf(m); return `<div class="card mcard ${S.done[m.id] ? 'done' : ''}" data-go="${m.id}"><span class="st">${S.done[m.id] ? '✓ 완료' : 'M' + (i + 1)}</span><div class="big">${m.icon}</div><h3>${esc(m.title)}</h3><p>${esc(m.sub)}</p></div>`; }).join('')}</div>`).join('')}
   <h2 class="sec-title">💳 사용료 한눈에</h2>
   <div class="card"><div class="plans" style="margin-top:0">${priceParts.map(p => `<div class="plan" style="cursor:default"><span class="pl">PLAN</span><br>${esc(p)}</div>`).join('')}</div>
   <p class="disc" style="margin-top:12px">미국 달러 월 요금 기준(2026년 11월 조사). 연간 결제·지역·프로모션에 따라 달라요. 결제 전 <a href="${E.url}" target="_blank" rel="noopener">공식 사이트</a>를 꼭 확인하세요.</p></div>
@@ -431,7 +432,7 @@ const WIDGETS = {
   sort(m, el) {
     const items = shuffle([
       ...['목표와 구성안(개요) 짜기', `${SHORT}에 줄 프롬프트·대본 작성`, '결과물 사실 확인·검수', '다음 도구로 넘길 형식으로 정리'].map(t => ({ t, w: 'c' })),
-      ...FEATS.slice(0, 4).map(f => ({ t: f.title, w: 'e' }))
+      ...shuffle(FEATS).slice(0, 4).map(f => ({ t: f.title, w: 'e' }))
     ]);
     let left = items.length;
     el.innerHTML = `<div class="sortl">${items.map((it, i) => `<div class="si" data-i="${i}"><span class="t">${esc(it.t)}</span><button class="c">✳️ Claude</button><button class="e">${CAT.icon} ${esc(SHORT)}</button></div>`).join('')}</div><div id="ptn"></div>`;
@@ -450,8 +451,10 @@ const WIDGETS = {
   },
 
   final(m, el) {
-    const pool = MISSIONS.filter(x => x.id !== 'final').flatMap(x => x.quiz);
-    const qs = pool.map(q => ({ ...q }));
+    const base = MISSIONS.filter(x => x.id !== 'final' && !/^f\d+$/.test(x.id)).flatMap(x => x.quiz);
+    const fq = MISSIONS.filter(x => /^f\d+$/.test(x.id)).flatMap(x => x.quiz);
+    const take = Math.min(fq.length, 10), step = fq.length / take;
+    const qs = base.concat(Array.from({ length: take }, (_, i) => fq[Math.floor(i * step)])).map(q => ({ ...q }));
     el.innerHTML = qs.map((q, qi) => `<div class="quiz" data-q="${qi}"><div class="q">Q${qi + 1}. ${esc(q.q)}</div>${q.o.map((o, oi) => `<button class="o" data-o="${oi}">${esc(o)}</button>`).join('')}</div>`).join('') +
       `<button class="btn g" id="grade">✅ 채점하기</button><div id="certBox"></div>`;
     const pick = {};
