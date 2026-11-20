@@ -57,7 +57,7 @@ P('geminicli', [
   'Gemini CLI가 프로젝트 규칙을 읽는 파일은?','GEMINI.md|package-lock.json|.env|favicon.ico',0,'GEMINI.md에 프로젝트 컨텍스트를 적어요.',
   '심화 기능','두 CLI의 규칙 파일을 같은 내용으로 유지하세요.'],
  ['⚙️','비대화형 실행·스크립트 연동','<b>-p 옵션</b>으로 한 줄 명령을 실행해 셸 스크립트·CI에 Gemini CLI를 끼워 넣어요.',
-  '명령 작성::gemini -p "..."|입력 파이프::cat file | gemini|출력 저장::> result.md|스크립트화::반복 실행',
+  '명령 작성::gemini -p "..."|입력 파이프::cat file 를 gemini로 전달|출력 저장::> result.md|스크립트화::반복 실행',
   '⚙️ 로그 파일 자동 요약 스크립트',
   'logs 폴더의 오류 로그를 Gemini CLI 비대화형 모드로 요약해 summary.md로 저장하는 bash 스크립트를 써 줘.',
   'Gemini CLI를 스크립트에서 한 번만 실행하는 방식은?','-p 비대화형 실행|대화형 창 유지|GUI 클릭|브라우저 확장',0,'-p 옵션으로 프롬프트를 바로 실행해요.',
