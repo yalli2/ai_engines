@@ -145,6 +145,8 @@ input[type=range]{width:100%;accent-color:var(--claude)}
 .side .qual{font-size:12px;color:var(--sub);margin-bottom:8px}
 .side .price{font-size:12.5px;color:var(--ink);background:#F7F5EF;border-radius:8px;padding:8px 10px}
 .side .price .lbl{font-size:11px;color:var(--mute);font-weight:700;display:block}
+.practice-link{display:inline-block;margin-top:10px;font-size:13px;font-weight:800;color:var(--claude-d);text-decoration:none;background:var(--claude-l);padding:6px 12px;border-radius:999px}
+.practice-link:hover{background:var(--claude);color:#fff}
 .flagnote{font-size:12px;color:#8A5A12;background:#FBF1DF;border-radius:8px;padding:6px 10px;margin-top:8px}
 
 /* ===== Tab 3 : overall ===== */
@@ -216,6 +218,7 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:12.5px;col
       <button class="tab" data-tab="cat">② 분야별 Top 10</button>
       <button class="tab" data-tab="all">③ 전체 협업 순위</button>
       <button class="tab" data-tab="method">④ 순위 산정 방식</button>
+      <a class="tab" href="practice/" style="text-decoration:none;color:#F5C9B5">⑤ 🎮 엔진별 연습실</a>
     </nav>
   </div>
 </header>
@@ -345,6 +348,7 @@ const CATMAP = Object.fromEntries(CATS.map(c => [c.id, c]));
 const TASKMAP = Object.fromEntries(TASKS.map(t => [t.id, t]));
 const EMAP = Object.fromEntries(ENGINES.map(e => [e.id, e]));
 const CATCOLOR = {llm:"#6B6A65",research:"#2F6FD6",image:"#C2410C",video:"#B91C5C",audio:"#7C3AED",avatar:"#DB2777",design:"#0E9F8E",coding:"#1F2937",automation:"#CA8A04",meeting:"#15803D"};
+const PRACTICE_EXT = {gamma:"https://yalli2.github.io/gamma_practice/", heygen:"https://yalli2.github.io/heyzen_practice/", zapier:"https://yalli2.github.io/zapier_practice/"};
 const ORDER = ["meeting","stt","research","paper","scrape","second","openmodel","docs","infographic","uidesign","logo","image","art","design","slides","translate","voice","music","podcast","video","avatar","edit","code","backend","automation","agent"];
 const connBadge = e => `<span class="conn ${e.conn}" title="${esc(CONN[e.conn].desc)}">${CONN[e.conn].label}</span>`;
 const fmtUSD = n => "$" + (Math.round(n*100)/100).toLocaleString("en-US");
@@ -458,7 +462,7 @@ function render(){
       <div class="pick">
         <div class="ring" style="--p:${e.collab}" title="Claude 협업도"><span>${e.collab}</span></div>
         <div><div class="nm"><a href="${e.url}" target="_blank" rel="noopener">${esc(e.name)}</a><span class="vd">${esc(e.vendor)}</span></div>
-          <div class="how">🔗 ${esc(e.how)}</div></div>
+          <div class="how">🔗 ${esc(e.how)}</div><a class="practice-link" href="${PRACTICE_EXT[e.id] || 'practice/' + e.id + '/'}" ${PRACTICE_EXT[e.id] ? 'target="_blank" rel="noopener"' : ''}>🎮 연습실에서 따라하기 →</a></div>
         <div class="pr"><b>💳 사용료</b>${esc(e.price)}</div>
       </div>
       <div class="feats">${e.feats.map(f=>`<span class="pill">${esc(f)}</span>`).join("")}</div>
@@ -509,6 +513,7 @@ function engCard(e, rank){
       <div class="top"><span class="nm"><a href="${e.url}" target="_blank" rel="noopener">${esc(e.name)}</a></span><span class="muted" style="font-size:12.5px">${esc(e.vendor)}</span>${connBadge(e)}<span class="pill">${API[e.api].label}</span>${e.ko?'<span class="pill">한국어 ◎</span>':""}</div>
       <ul>${e.feats.map(f=>`<li>${esc(f)}</li>`).join("")}</ul>
       <div class="how"><b>Claude 연동:</b> ${esc(e.how)}</div>${flag}
+      <a class="practice-link" href="${PRACTICE_EXT[e.id] || 'practice/' + e.id + '/'}" ${PRACTICE_EXT[e.id] ? 'target="_blank" rel="noopener"' : ''}>🎮 ${esc(e.name.split(' (')[0])} 연습실에서 따라하기 →</a>
     </div>
     <div class="side">
       <div class="score"><b>${e.collab}</b><span>/ 100 Claude 협업도</span></div>
